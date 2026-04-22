@@ -18,7 +18,7 @@ def playing_area():
     pen.end_fill()
     
 class Player(Turtle):
-    def __init__(self, x, y, color, screen, right_key, left_key):
+    def __init__(self, x, y, color, screen, right_key, left_key, fire_key):
         super().__init__()
         self.ht()
         self.speed(0)
@@ -28,10 +28,12 @@ class Player(Turtle):
         self.setheading(90)
         self.shape("turtle")
         self.bullets = []
+        self.hue = color
         self.alive = True
         self.st()
         screen.onkeypress(self.turn_left, left_key)
         screen.onkeypress(self.turn_right, right_key)
+        screen.onkey(self.fire, fire_key)
 
     def turn_left(self):
         self.left(10)
@@ -46,6 +48,31 @@ class Player(Turtle):
         if self.ycor() > 230 or self.ycor() < -230:
             self.setheading(-self.heading())
 
+    def fire(self):
+        self.bullets.append(Bullet(self))
+
+class Bullet(Turtle):
+    def __init__(self, player):
+        super().__init__()
+        self.pu()
+        self.speed(0)
+        self.setheading(player.heading())
+        self.color(player.hue)
+        self.goto(player.xcor(), player.ycor())
+        self.player = player
+        self.st()
+
+    def move_bullet(self):
+        self.forward(4)
+        if self.xcor() > 230 or self.xcor() < -230:
+            self.ht()
+            self.player.bullets.remove(self)
+        if self.ycor() > 230 or self.ycor() < -230:
+            self.ht()
+            self.player.bullets.remove(self)
+    
+
+
 screen = Screen()
 screen.bgcolor("black")
 screen.setup(520,520)
@@ -55,12 +82,16 @@ screen.listen()
 
 playing_area()
 
-p1 = Player(-100, 0, "red",screen, "d", "a")
-p2 = Player(100,0,"blue",screen, "Right","Left")
+p1 = Player(-100, 0, "red",screen, "d", "a", "w")
+p2 = Player(100,0,"blue",screen, "Right","Left", "Up")
 
 while p1.alive and p2.alive:
     p1.move()
     p2.move()
+    for bullet in p1.bullets:
+        bullet.move_bullet()
+    for bullet in p1.bullets:
+        bullet.move_bullet()
 
 
 screen.exitonclick()
