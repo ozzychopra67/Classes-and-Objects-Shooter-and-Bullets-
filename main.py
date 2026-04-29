@@ -18,7 +18,7 @@ def playing_area():
     pen.end_fill()
     
 class Player(Turtle):
-    def __init__(self, x, y, color, screen, right_key, left_key, fire_key):
+    def __init__(self, x, y, color, screen, right_key, left_key, fire_key, health):
         super().__init__()
         self.ht()
         self.speed(0)
@@ -30,6 +30,7 @@ class Player(Turtle):
         self.bullets = []
         self.hue = color
         self.alive = True
+        self.health = health
         self.st()
         screen.onkeypress(self.turn_left, left_key)
         screen.onkeypress(self.turn_right, right_key)
@@ -54,8 +55,9 @@ class Player(Turtle):
 class Bullet(Turtle):
     def __init__(self, player):
         super().__init__()
-        self.pu()
+        self.ht()
         self.speed(0)
+        self.pu()
         self.setheading(player.heading())
         self.color(player.hue)
         self.goto(player.xcor(), player.ycor())
@@ -63,7 +65,7 @@ class Bullet(Turtle):
         self.st()
 
     def move_bullet(self):
-        self.forward(4)
+        self.forward(10)
         if self.xcor() > 230 or self.xcor() < -230:
             self.ht()
             self.player.bullets.remove(self)
@@ -71,27 +73,57 @@ class Bullet(Turtle):
             self.ht()
             self.player.bullets.remove(self)
     
+    def die(self):
+        self.ht()
+        self.player.bullets.remove(self)
+    
+
+
+
 
 
 screen = Screen()
 screen.bgcolor("black")
 screen.setup(520,520)
-# Key Binding. Connects key presses and mouse clicks with function calls
+
 screen.listen()
 
 
 playing_area()
 
-p1 = Player(-100, 0, "red",screen, "d", "a", "w")
-p2 = Player(100,0,"blue",screen, "Right","Left", "Up")
+p1 = Player(-100, 0, "red",screen, "d", "a", "w",3)
+p2 = Player(100,0,"blue",screen, "Right","Left", "Up",3)
 
 while p1.alive and p2.alive:
     p1.move()
     p2.move()
     for bullet in p1.bullets:
         bullet.move_bullet()
-    for bullet in p1.bullets:
+        if bullet.distance(p2) < 20:
+            bullet.die()
+            p2.health -= 1
+            if p2.health == 2:
+                p2.color("yellow")
+            elif p2.health == 1:
+                p2.color("red")
+            elif p2.health == 0:
+                p2.ht()
+                p2.alive = False
+            
+
+    for bullet in p2.bullets:
         bullet.move_bullet()
+        if bullet.distance(p1) < 20:
+            bullet.die()
+            p1.health -= 1
+            if p1.health == 2:
+                p1.color("yellow")
+            elif p1.health == 1:
+                p1.color("red")
+            elif p1.health == 0:
+                p1.ht()
+                p1.alive = False
+
 
 
 screen.exitonclick()
