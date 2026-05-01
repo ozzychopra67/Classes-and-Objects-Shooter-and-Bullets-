@@ -8,7 +8,7 @@ def playing_area():
     pen = Turtle()
     pen.ht()
     pen.speed(0)
-    pen.color('teal')
+    pen.color('light blue')
     pen.begin_fill()
     pen.goto(-240,240)
     pen.goto(240,240)
@@ -17,112 +17,80 @@ def playing_area():
     pen.goto(-240,240)
     pen.end_fill()
     
-class Player(Turtle):
-    def __init__(self, x, y, color, screen, right_key, left_key, fire_key, health):
-        super().__init__()
-        self.ht()
-        self.speed(0)
-        self.color(color)
-        self.penup()
-        self.goto(x,y)
-        self.setheading(90)
-        self.shape("turtle")
-        self.bullets = []
-        self.hue = color
-        self.alive = True
-        self.health = health
-        self.st()
-        screen.onkeypress(self.turn_left, left_key)
-        screen.onkeypress(self.turn_right, right_key)
-        screen.onkey(self.fire, fire_key)
+class Head(Turtle):
 
-    def turn_left(self):
-        self.left(10)
+  def __init__(self, screen, body):
+    super().__init__()
+    self.shape("square")
+    self.color("black")
+    self.pu()
+    self.goto(0,0)
+    self.alive = True
+    screen.onkey(self.up,"Up")
+    screen.onkey(self.down, "Down")
+    screen.onkey(self.left, "Left")
+    screen.onkey(self.right, "Right")
 
-    def turn_right(self):
-        self.right(10)
-
-    def move(self):
-        self.forward(4)
-        if self.xcor() > 230 or self.xcor() < -230:
-            self.setheading(180 - self.heading())
-        if self.ycor() > 230 or self.ycor() < -230:
-            self.setheading(-self.heading())
-
-    def fire(self):
-        self.bullets.append(Bullet(self))
-
-class Bullet(Turtle):
-    def __init__(self, player):
-        super().__init__()
-        self.ht()
-        self.speed(0)
-        self.pu()
-        self.setheading(player.heading())
-        self.color(player.hue)
-        self.goto(player.xcor(), player.ycor())
-        self.player = player
-        self.st()
-
-    def move_bullet(self):
-        self.forward(10)
-        if self.xcor() > 230 or self.xcor() < -230:
-            self.ht()
-            self.player.bullets.remove(self)
-        if self.ycor() > 230 or self.ycor() < -230:
-            self.ht()
-            self.player.bullets.remove(self)
-    
-    def die(self):
-        self.ht()
-        self.player.bullets.remove(self)
-    
+  def up(self):
+    if self.heading() != 270:
+      self.setheading(90)
 
 
+  def down(self):
+    if self.heading() != 90:
+      self.setheading(270)
+
+  def left(self):
+    if self.heading() != 0:
+      self.setheading(180)
 
 
+  def right(self):
+    if self.heading() != 180:
+      self.setheading(0)
+
+  def die(self):
+    self.alive = False
+
+  def move(self):
+    self.forward(20)
+    if self.xcor() > 240 or self.xcor() < -240:
+      self.ht()
+      self.die(self)
+    elif self.ycor() > 240 or self.ycor() < -240:
+      self.ht()
+      self.die(self)
+
+
+class Segment(Turtle):
+  def __init__(self, other):
+    super().__init__()
+    pass
+
+  def move(self, other):
+    pass
+
+class Apple(Turtle):
+  def __init__(self):
+    super().__init__()
+    pass
+
+  def relocate(self):
+    pass
 
 screen = Screen()
 screen.bgcolor("black")
 screen.setup(520,520)
-
+# Key Binding. Connects key presses and mouse clicks with function calls
 screen.listen()
-
-
 playing_area()
+body = []
 
-p1 = Player(-100, 0, "red",screen, "d", "a", "w",3)
-p2 = Player(100,0,"blue",screen, "Right","Left", "Up",3)
 
-while p1.alive and p2.alive:
-    p1.move()
-    p2.move()
-    for bullet in p1.bullets:
-        bullet.move_bullet()
-        if bullet.distance(p2) < 20:
-            bullet.die()
-            p2.health -= 1
-            if p2.health == 2:
-                p2.color("yellow")
-            elif p2.health == 1:
-                p2.color("red")
-            elif p2.health == 0:
-                p2.ht()
-                p2.alive = False
-            
+screen.exitonclick()
 
-    for bullet in p2.bullets:
-        bullet.move_bullet()
-        if bullet.distance(p1) < 20:
-            bullet.die()
-            p1.health -= 1
-            if p1.health == 2:
-                p1.color("yellow")
-            elif p1.health == 1:
-                p1.color("red")
-            elif p1.health == 0:
-                p1.ht()
-                p1.alive = False
+
+
 
 
 
